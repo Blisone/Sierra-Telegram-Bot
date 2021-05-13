@@ -1,0 +1,89 @@
+
+using System;
+using Telegram.Bot;
+using Telegram.Bot.Types.ReplyMarkups;
+using System.Threading.Tasks;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InputFiles;
+using System.Data.SQLite;
+using Telegram.Bot.Args;
+using System.Collections.Generic;
+using System.IO;
+using Microsoft.Extensions.Configuration;
+using System.Threading;
+using System.Linq;
+using System.Text;
+
+namespace Botsiee
+{
+    class Program
+    {
+        private static string token { get; set; } = "1782103015:AAH0Ib427fwxxZbfpRx4MHshxp8cG4m5gaQ"; //Bot token
+        private static TelegramBotClient client; //Объявление бота
+
+
+
+        static void Main(string[] args)
+        { 
+            
+            client = new TelegramBotClient(token);
+            //Отправка сообщений
+            client.StartReceiving();
+            client.OnMessage += OnMessageHandler;
+            Console.ReadLine();
+            client.StopReceiving();
+        }
+
+        private static async void OnMessageHandler(object sender, MessageEventArgs e)
+        {
+            // var chat = e.Update.Message.Chat;
+            var msg = e.Message;
+            if (msg.Text != null) //Проверка сообщений, не пустое ли сообщение
+            {
+                Console.WriteLine($"Пришло сообщение с текстом: {msg.Text}"); //Вывод сообщений пользователя мне в консоль
+                switch (msg.Text)
+                {
+                    case "\U0001F4FA Кино": //Список каналов категории - КИНО
+                        var A = await client.SendTextMessageAsync(chatId: msg.Chat.Id, "\U0001F3AC Telegram каналы, где можно посмотреть фильмы бесплатно: \n\n1. @movies_filmy - Фильмы | Сериалы \n\n2. @TBOE_TB - ТВОЁ ТВ | Новости \n\n3. @kinogooo_film - Kinogo | Новинки Кино \n\n4. @filmy_telegram - Фильмы Сериалы | КиноСтарс \n\n5. @FilmsFHD - Фильмы HD \n\n6. @Multiki9 - Мультики и Мультфильмы \n\n7. @FilmssHD - Фильмы | Новинки |Мортал Комбат \n\n8. @marvel4 - Marvel/DC \n\n9. @Filmy_Kinomania - Киномания | Я - легенда 2 | Веном 2 \n\n10. @newfilms_onlain - Фильмы | Imbi", replyMarkup: GetButtons());
+                        break;
+                    case "\U0001f913 Курсы": //Список каналов категории - КУРСЫ
+                        var B = await client.SendTextMessageAsync(chatId: msg.Chat.Id, "\U0001F393 Telegram каналы с бесплатными курсами: \n\n1. @free_edu - Бесплатное образование \n\n2. @sharewoodbiz - SHAREWOOD \n\n3. @slivytg - Отборные сливы || Курсы \n\n4. @sliwbl - Сливы \n\n5. @ProEdux - Бесплатные курсы", replyMarkup: GetButtons());
+                        break;
+                    case "\U0001F30D Новости": //Список каналов категории - НОВОСТИ
+                        var C = await client.SendTextMessageAsync(chatId: msg.Chat.Id, "\U0001F4F0 Новостные каналы в Telegram: \n\n1. @breakingmash - Mash \n\n2. @meduzalive - Медуза — LIVE \n\n3. @lentachold - Лентач \n\n4. @varlamov_news - Varlamov News \n\n5. @tvrain - Телеканал Дождь \n\n6. @bazabazon - Baza \n\n7. @black_journall - BLACK JOURNAL | Новости Звезд \n\n8. @rhymestg - Рифмы и Панчи \n\n9. @oldlentach - Тру Лентач \n\n10. @mashmoyka - Mash на Мойке", replyMarkup: GetButtons());
+                        break;
+                    case "\U0001F47D Наука/Факты": //Список каналов категории - НАУКА И ФАКТЫ
+                        var D = await client.SendTextMessageAsync(chatId: msg.Chat.Id, "\U0001F340 Telegram каналы с интересными фактами: \n\n1. @nsmag - Naked Science \n\n2. @GoogleProf - Профессор ГУГЛОВА \n\n3. @kosmostime - Kosmos Time | Наука | Физика \n\n4. @nauka_and_technologies - Наука и Технологии \n\n5. @deepinterest - Эпицентр знаний \n\n6. @Historical_Photography - The История \n\n7. @ThinkCritical - Критическое мышление \n\n8. @funscience - Наука от Funscience \n\n9. @factorium5 - Факториум \n\n10. @factonim - Невероятно, но факт", replyMarkup: GetButtons());
+                        break;
+                    case "/start": //Команда /start (Приветственное сообщение)
+                        var E = await client.SendTextMessageAsync(chatId: msg.Chat.Id, "\U0001F44B Привет! Я бот, который посоветует тебе классные Telegram каналы. Нажми на кнопку и я дам тебе список. \n(Напиши /help, чтобы увидеть дополнительные команды)", replyMarkup: GetButtons());
+                        break;
+                    case "/steaker": //Команда /steker (Бот присылает стикер. CAACAgIAAxkBAAECS_pgnAfoAXWbl0VVgG4_40nxi1_DmAACXhIAAofV8EvIW0ayTZ-bPB8E - ID стикера)
+                        var stic = await client.SendStickerAsync(chatId: msg.Chat.Id, "CAACAgIAAxkBAAECS_pgnAfoAXWbl0VVgG4_40nxi1_DmAACXhIAAofV8EvIW0ayTZ-bPB8E", replyMarkup: GetButtons());
+                        break;
+                    case "/help": //Команда /help (Список дополнительных команд)
+                        var F = await client.SendTextMessageAsync(chatId: msg.Chat.Id, "Список дополнительных комманд: \n\n/steaker - Бот отправит вам классный стикер :) \n\n/contact - Обратная связь с разработчитом", replyMarkup: GetButtons());
+                        break;
+                    case "/contact": // Команда /contact (Контактная информация. Связь со мной)
+                        var G = await client.SendTextMessageAsync(chatId: msg.Chat.Id, "Обратная связь с разработчиком бота. По всем вопросам обращаться: \n\nInstagram - https://instagram.com/mad_ilyaa?r=nametag \n\nVK - https://vk.com/ignatenko99", replyMarkup: GetButtons());
+                        break;
+                }
+                //Console.WriteLine(sb);
+                //await client.SendTextMessageAsync(msg.Chat.Id, msg.Text, replyMarkup: GetButtons());
+            }
+        }
+
+        private static IReplyMarkup GetButtons() //Клавиатура бота
+        {
+            return new ReplyKeyboardMarkup
+            {
+                Keyboard = new List<List<KeyboardButton>>
+                {
+                    new List<KeyboardButton>{new KeyboardButton { Text = "\U0001F4FA Кино" }, new KeyboardButton { Text = "\U0001F30D Новости" } }, //Первый ряд кнопок
+                     new List<KeyboardButton>{new KeyboardButton { Text = "\U0001f913 Курсы" }, new KeyboardButton { Text = "\U0001F47D Наука/Факты" } } //Второй ряд кнопок
+                }
+            };
+        }
+    }
+}
+
